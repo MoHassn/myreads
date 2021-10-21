@@ -1,21 +1,18 @@
 import React from "react";
+import { BookItem, Shelf } from "../interfaces/interfaces";
 
 export interface BookProps {
-  id: string;
-  title: string;
-  authors: string[];
-  shelf: "wantToRead" | "currentlyReading" | "read";
-  imageLinks: {
-    thumbnail: string;
-  };
+  book: BookItem;
+  setBookShelf: (book: BookItem, shelf: Shelf) => void;
 }
 
-const Book = ({
-  title,
-  authors,
-  shelf,
-  imageLinks: { thumbnail },
-}: BookProps) => {
+const Book = ({ book, setBookShelf }: BookProps) => {
+  const {
+    title,
+    authors,
+    shelf,
+    imageLinks: { thumbnail },
+  } = book;
   return (
     <>
       <li>
@@ -30,7 +27,13 @@ const Book = ({
               }}
             ></div>
             <div className="book-shelf-changer">
-              <select value={shelf}>
+              <select
+                value={shelf || "none"}
+                onChange={(e) => {
+                  const shelf = e.target.value as Shelf;
+                  setBookShelf(book, shelf);
+                }}
+              >
                 <option value="move" disabled>
                   Move to...
                 </option>
@@ -42,7 +45,7 @@ const Book = ({
             </div>
           </div>
           <div className="book-title">{title}</div>
-          <div className="book-authors">{authors.join(" & ")}</div>
+          <div className="book-authors">{authors && authors.join(" & ")}</div>
         </div>
       </li>
     </>
