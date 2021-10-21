@@ -1,10 +1,6 @@
+import { Shelf, BookItem } from "./interfaces/interfaces";
+
 const api = "https://reactnd-books-api.udacity.com";
-
-interface Book {
-  id: string;
-}
-
-type Shelf = "wantToRead" | "currentlyReading" | "read";
 
 // Generate a unique token for storing your bookshelf data on the backend server.
 let token = localStorage.token;
@@ -25,7 +21,7 @@ export const getAll = () =>
     .then((res) => res.json())
     .then((data) => data.books);
 
-export const update = (book: Book, shelf: Shelf) =>
+export const update = (book: BookItem, shelf: Shelf) =>
   fetch(`${api}/books/${book.id}`, {
     method: "PUT",
     headers: {
