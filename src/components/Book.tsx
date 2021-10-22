@@ -7,12 +7,7 @@ export interface BookProps {
 }
 
 const Book = ({ book, setBookShelf }: BookProps) => {
-  const {
-    title,
-    authors,
-    shelf,
-    imageLinks: { thumbnail },
-  } = book;
+  const { title, authors, shelf, imageLinks: { thumbnail } = {} } = book;
   return (
     <>
       <li>
