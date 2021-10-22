@@ -31,7 +31,7 @@ export const update = (book: BookItem, shelf: Shelf) =>
     body: JSON.stringify({ shelf }),
   }).then((res) => res.json());
 
-export const search = (query: string) =>
+export const search = (query: string, signal: AbortSignal) =>
   fetch(`${api}/search`, {
     method: "POST",
     headers: {
@@ -39,6 +39,7 @@ export const search = (query: string) =>
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query }),
+    signal,
   })
     .then((res) => res.json())
     .then((data) => data.books);

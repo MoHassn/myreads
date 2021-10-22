@@ -1,27 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as BooksAPI from "./BooksAPI";
 import "./App.css";
 import Book from "./components/Book";
-import { BookProps } from "./components/Book";
+import { BookItem, Shelf } from "./interfaces/interfaces";
 
 function BooksApp() {
   const [showSearchPage, setShowSearchPage] = useState(false);
-  const [books, setBooks] = useState<BookProps[]>([]);
+  const [books, setBooks] = useState<BookItem[]>([]);
+  const [searchResult, setSearchResult] = useState<BookItem[]>([]);
+  const [noResult, setNoResult] = useState(false);
+  const abortController = useRef<AbortController>();
 
   useEffect(() => {
     BooksAPI.getAll().then((books) => {
       setBooks(books);
     });
-  });
-  // state = {
-  //   /**
-  //    * TODO: Instead of using this state variable to keep track of which page
-  //    * we're on, use the URL in the browser's address bar. This will ensure that
-  //    * users can use the browser's back and forward buttons to navigate between
-  //    * pages, as well as provide a good URL they can bookmark and share.
-  //    */
-  //   showSearchPage: false,
-  // };
+  }, []);
+
+  const setBookShelf = (book: BookItem, shelf: Shelf) => {
+    BooksAPI.update(book, shelf)
+      .then((d) => {
+        setBooks([
+          ...books.filter((bookItem) => bookItem.id !== book.id),
+          { ...book, shelf },
+        ]);
+      })
+      .catch((e) => console.log("Error Happened while updating book", e));
+  };
+
+  const searchBooks = (query: string) => {
+    /*
+    This is to cancel previous requests.
+    To avoid delayed previous search results
+    being shown instead of the new ones.
+    I learned the concepts from these two sources:
+      https://davidwalsh.name/cancel-fetch
+      https://css-tricks.com/how-to-cancel-pending-api-requests-to-show-correct-data/
+    */
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    abortController.current = new AbortController();
+    const signal = abortController.current.signal;
+    BooksAPI.search(query, signal)
+      .then((books) => {
+        console.log("books", books);
+        if (books && !books.error) {
+          setSearchResult(books);
+        } else {
+          setNoResult(true);
+          setSearchResult([]);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   return (
     <div className="app">
@@ -43,11 +77,23 @@ function BooksApp() {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-              <input type="text" placeholder="Search by title or author" />
+              <input
+                type="text"
+                onChange={(e) => {
+                  setNoResult(false);
+                  searchBooks(e.target.value);
+                }}
+                placeholder="Search by title or author"
+              />
             </div>
           </div>
           <div className="search-books-results">
-            <ol className="books-grid"></ol>
+            <ol className="books-grid">
+              {searchResult.map((book) => (
+                <Book key={book.id} book={book} setBookShelf={setBookShelf} />
+              ))}
+              {noResult && <div>No Results where found </div>}
+            </ol>
           </div>
         </div>
       ) : (
@@ -66,11 +112,8 @@ function BooksApp() {
                       .map((book) => (
                         <Book
                           key={book.id}
-                          title={book.title}
-                          authors={book.authors}
-                          id={book.id}
-                          shelf={book.shelf}
-                          imageLinks={book.imageLinks}
+                          book={book}
+                          setBookShelf={setBookShelf}
                         />
                       ))}
                   </ol>
@@ -85,11 +128,8 @@ function BooksApp() {
                       .map((book) => (
                         <Book
                           key={book.id}
-                          title={book.title}
-                          authors={book.authors}
-                          id={book.id}
-                          shelf={book.shelf}
-                          imageLinks={book.imageLinks}
+                          book={book}
+                          setBookShelf={setBookShelf}
                         />
                       ))}
                   </ol>
@@ -104,11 +144,8 @@ function BooksApp() {
                       .map((book) => (
                         <Book
                           key={book.id}
-                          title={book.title}
-                          authors={book.authors}
-                          id={book.id}
-                          shelf={book.shelf}
-                          imageLinks={book.imageLinks}
+                          book={book}
+                          setBookShelf={setBookShelf}
                         />
                       ))}
                   </ol>
