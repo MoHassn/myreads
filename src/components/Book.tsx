@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import { BookItem, Shelf } from "../interfaces/interfaces";
-
-export interface BookProps {
-  book: BookItem;
-  setBookShelf: (book: BookItem, shelf: Shelf) => void;
-}
+import { Shelf, BookProps } from "../interfaces/interfaces";
 
 const Book = ({ book, setBookShelf }: BookProps) => {
   const { title, authors, shelf, imageLinks: { thumbnail } = {} } = book;

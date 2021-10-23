@@ -13,3 +13,7 @@ export interface BookItem {
 export interface Shelves {
   [id: string]: Shelf;
 }
+export interface BookProps {
+  book: BookItem;
+  setBookShelf: (book: BookItem, shelf: Shelf) => void;
+}
