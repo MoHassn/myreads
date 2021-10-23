@@ -9,3 +9,7 @@ export interface BookItem {
     thumbnail: string;
   };
 }
+
+export interface Shelves {
+  [id: string]: Shelf;
+}

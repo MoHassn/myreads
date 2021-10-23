@@ -4,6 +4,7 @@ import * as BooksAPI from "./BooksAPI";
 import "./App.css";
 import Book from "./components/Book";
 import { BookItem, Shelf } from "./interfaces/interfaces";
+import addShelf from "./helpers/addShelfToSearchResult";
 
 function BooksApp() {
   const [books, setBooks] = useState<BookItem[]>([]);
@@ -43,9 +44,10 @@ function BooksApp() {
     abortController.current = new AbortController();
     const signal = abortController.current.signal;
     BooksAPI.search(query, signal)
-      .then((books) => {
-        if (books && !books.error) {
-          setSearchResult(books);
+      .then((resultBooks) => {
+        if (resultBooks && !resultBooks.error) {
+          const booksWithShelves = addShelf(books, resultBooks);
+          setSearchResult(booksWithShelves);
         } else {
           setNoResult(true);
           setSearchResult([]);

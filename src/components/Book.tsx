@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BookItem, Shelf } from "../interfaces/interfaces";
 
 export interface BookProps {
@@ -8,6 +8,8 @@ export interface BookProps {
 
 const Book = ({ book, setBookShelf }: BookProps) => {
   const { title, authors, shelf, imageLinks: { thumbnail } = {} } = book;
+
+  const [value, setValue] = useState(shelf);
   return (
     <>
       <li>
@@ -23,10 +25,11 @@ const Book = ({ book, setBookShelf }: BookProps) => {
             ></div>
             <div className="book-shelf-changer">
               <select
-                value={shelf || "none"}
+                value={value || "none"}
                 onChange={(e) => {
                   const shelf = e.target.value as Shelf;
                   setBookShelf(book, shelf);
+                  setValue(shelf);
                 }}
               >
                 <option value="move" disabled>
